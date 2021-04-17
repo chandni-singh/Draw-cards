@@ -16,14 +16,20 @@ class Deck extends Component {
 
     async componentDidMount() {
         let response = await axios.get('https://deckofcardsapi.com/api/deck/new/shuffle');
-        console.log(response.data);
 
         this.setState({deckID : response.data.deck_id});
     }
 
     async getNewCard() {
         let res = await axios.get(`https://deckofcardsapi.com/api/deck/${this.state.deckID}/draw`);
-        this.setState({ cardImg : res.data.cards[0].image, cardAlt : res.data.cards[0].code})
+        console.log(res.data.remaining);
+        if(res.data.remaining !== 0) {
+            this.setState({ cardImg : res.data.cards[0].image, cardAlt : res.data.cards[0].code})
+        }
+        else {
+            alert('Deck is empty, no cards left!');
+        }
+        
     }
 
     render() {
