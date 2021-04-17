@@ -28,7 +28,7 @@ class Deck extends Component {
             let cardRes = await axios.get(`${API_BASE_URL}${this.state.deck.deck_id}/draw/`);
 
             if(!cardRes.data.success) {
-                throw new Error('Deck is empty, no cards left!');
+                throw new Error("Deck is empty, no cards left!")
             }
 
             this.setState( st => ({
@@ -43,8 +43,8 @@ class Deck extends Component {
     render() {
         return(
             <div className = 'Deck'>
-                <h1>Card Dealer</h1>
-                <button onClick = {this.getNewCard}>Gimme a card!</button>
+                <h1 className = "Deck-title">Card Dealer</h1>
+                <button className = "Deck-btn" onClick = {this.getNewCard}>Gimme a card!</button>
                 <div className = "Deck-cardarea">
                     {this.state.cards && this.state.cards.map( c => 
                         <Card url = {c.img} alt = {c.id} key = {c.id} />
