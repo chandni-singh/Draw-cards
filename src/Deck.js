@@ -2,41 +2,51 @@ import React, {Component} from 'react';
 import Card from './Card';
 import axios from 'axios';
 
+const API_BASE_URL = "https://deckofcardsapi.com/api/deck/";
+
 class Deck extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            deckID : '',
-            cardImg : '',
-            cardAlt : ''
+            deck : null,
+            cards : []
         }
         this.getNewCard = this.getNewCard.bind(this);
     }
 
     async componentDidMount() {
-        let response = await axios.get('https://deckofcardsapi.com/api/deck/new/shuffle');
+        let response = await axios.get(`${API_BASE_URL}new/shuffle`);
 
-        this.setState({deckID : response.data.deck_id});
+        this.setState({deck : response.data});
     }
 
     async getNewCard() {
-        let res = await axios.get(`https://deckofcardsapi.com/api/deck/${this.state.deckID}/draw`);
-        console.log(res.data.remaining);
-        if(res.data.remaining !== 0) {
-            this.setState({ cardImg : res.data.cards[0].image, cardAlt : res.data.cards[0].code})
-        }
-        else {
-            alert('Deck is empty, no cards left!');
-        }
-        
+
+        try {
+            let cardRes = await axios.get(`${API_BASE_URL}${this.state.deck.deck_id}/draw/`);
+
+            if(!cardRes.data.success) {
+                let err = new Error('Deck is empty, no cards left!');
+            }
+
+            this.setState( st => ({
+                cards : [...st.cards, {id : cardRes.data.cards[0].code, img : cardRes.data.cards[0].image}]
+            }));
+
+        } catch(err) {
+            alert(err);
+        }  
     }
 
     render() {
         return(
             <div>
+                <h1>Card Dealer</h1>
                 <button onClick = {this.getNewCard}>Gimme a card!</button>
-                {this.state.cardImg && <Card url = {this.state.cardImg} alt = {this.state.cardAlt} />}
+                {this.state.cards && this.state.cards.map( c => 
+                    <Card url = {c.img} alt = {c.id} key = {c.id} />
+                )}
             </div>
 
         )
